@@ -4,26 +4,30 @@
 
 
 def rotate_2d_matrix(matrix):
-    """Rotates an m by n 2D matrix in place.
+    """Rotates an n by n 2D matrix in place.
     """
-    if type(matrix) != list:
+    if not isinstance(matrix, list):
         return
-    if len(matrix) <= 0:
+    if len(matrix) == 0:
         return
-    if not all(map(lambda x: type(x) == list, matrix)):
+    if not all(isinstance(row, list) for row in matrix):
         return
-    rows = len(matrix)
-    cols = len(matrix[0])
-    if not all(map(lambda x: len(x) == cols, matrix)):
+    n = len(matrix)
+    if not all(len(row) == n for row in matrix):
         return
-    c, r = 0, rows - 1
-    for i in range(cols * rows):
-        if i % rows == 0:
-            matrix.append([])
-        if r == -1:
-            r = rows - 1
-            c += 1
-        matrix[-1].append(matrix[r][c])
-        if c == cols - 1 and r >= -1:
-            matrix.pop(r)
-        r -= 1
+
+    for layer in range(n // 2):
+        first = layer
+        last = n - layer - 1
+        for i in range(first, last):
+            # offset is used to avoid overwriting
+            offset = i - first
+            top = matrix[first][i]
+            # left -> top
+            matrix[first][i] = matrix[last - offset][first]
+            # bottom -> left
+            matrix[last - offset][first] = matrix[last][last - offset]
+            # right -> bottom
+            matrix[last][last - offset] = matrix[i][last]
+            # top -> right
+            matrix[i][last] = top
